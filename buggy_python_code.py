@@ -2,6 +2,7 @@ import sys
 import os
 import yaml
 import flask
+import importlib
 
 app = flask.Flask(__name__)
 
@@ -25,7 +26,15 @@ def print_nametag(format_string, person):
 
 def fetch_website(urllib_version, url):
     # Import the requested version (2 or 3) of urllib
-    exec(f"import urllib{urllib_version} as urllib", globals())
+    version = str(urllib_version).strip()
+    allowed_modules = {
+        "3": "urllib3",
+        "urllib3": "urllib3",
+    }
+    module_name = allowed_modules.get(version)
+    if not module_name:
+        raise ValueError("Unsupported urllib version")
+    urllib = importlib.import_module(module_name)
     # Fetch and print the requested URL
  
     try: 
